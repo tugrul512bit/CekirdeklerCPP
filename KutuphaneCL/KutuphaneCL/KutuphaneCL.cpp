@@ -1064,16 +1064,16 @@ extern "C"
 				&(hArr->evt), NULL);
 
 		if (hBuffer->arr___ == NULL && !hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0,
-				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0,
+				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
 		else if (hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0,
-				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, &(hArr->evt), &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0,
+				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, &(hArr->evt), &(hEvt->evt)));
 
 
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
-				NULL, &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
+				NULL, &(hEvt->evt)));
 
 	}
 
@@ -1088,16 +1088,16 @@ extern "C"
 				&(hArr->evt), NULL);
 
 		if (hBuffer->arr___ == NULL && !hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0,
-				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0,
+				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
 		else if (hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0,
-				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, &(hArr->evt), &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0,
+				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, &(hArr->evt), &(hEvt->evt)));
 
 
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
-				NULL, &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
+				NULL, &(hEvt->evt)));
 
 	}
 
@@ -1116,13 +1116,13 @@ extern "C"
 	__declspec(dllexport)
 		void finish(OpenClCommandQueue * hCommandQueue)
 	{
-		hCommandQueue->commandQueue.finish();
+		handleError(hCommandQueue->commandQueue.finish());
 	}
 
 	__declspec(dllexport)
 		void flush(OpenClCommandQueue * hCommandQueue)
 	{
-		hCommandQueue->commandQueue.flush();
+		handleError(hCommandQueue->commandQueue.flush());
 	}
 
 	__declspec(dllexport)
@@ -1135,8 +1135,8 @@ extern "C"
 		evt.push_back(evt0);
 		evt.push_back(evt1);
 
-		hCommandQueue->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[0]);
-		hCommandQueue2->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[1]);
+		handleError(hCommandQueue->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[0]));
+		handleError(hCommandQueue2->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[1]));
 
 		cl_event * evt_ = new cl_event[2];
 		evt_[0] = evt[0].operator()();
@@ -1147,26 +1147,26 @@ extern "C"
 
 
 		int evtStatus0 = 0;
-		clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
-			sizeof(cl_int), &evtStatus0, NULL);
+		handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
+			sizeof(cl_int), &evtStatus0, NULL));
 
 		while (evtStatus0 > 0)
 		{
 
-			clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
-				sizeof(cl_int), &evtStatus0, NULL);
+			handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
+				sizeof(cl_int), &evtStatus0, NULL));
 			Sleep(0);
 		}
 
 		int evtStatus1 = 0;
-		clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
-			sizeof(cl_int), &evtStatus1, NULL);
+		handleError(clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
+			sizeof(cl_int), &evtStatus1, NULL));
 
 		while (evtStatus1 > 0)
 		{
 
-			clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
-				sizeof(cl_int), &evtStatus1, NULL);
+			handleError(clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
+				sizeof(cl_int), &evtStatus1, NULL));
 			Sleep(0);
 		}
 
@@ -1193,14 +1193,17 @@ extern "C"
 			if (err___ == CL_INVALID_CONTEXT)
 			{
 				printf("CL_INVALID_CONTEXT");
+				throw std::runtime_error("invalid context");
 			}
 			if (err___ == CL_OUT_OF_RESOURCES)
 			{
 				printf("CL_OUT_OF_RESOURCES ");
+				throw std::runtime_error("out of resources");
 			}
 			if (err___ == CL_OUT_OF_HOST_MEMORY)
 			{
 				printf("CL_OUT_OF_HOST_MEMORY ");
+				throw std::runtime_error("out of host memory");
 			}
 			//evt2.push_back(cl::UserEvent(ct));
 		}
@@ -1225,7 +1228,7 @@ extern "C"
 			}*/
 
 			cl_int err____ = clReleaseEvent(evt[0]);
-
+			handleError(err____);
 			if (err____ == CL_INVALID_CONTEXT)
 			{
 				printf("CL_INVALID_CONTEXT");
@@ -1298,8 +1301,8 @@ extern "C"
 		void addUserEvent(OpenClCommandQueue * hCommandQueue, OpenClUserEvent * hEvt)
 	{
 		cl_event ev;
-		clEnqueueMarkerWithWaitList(hCommandQueue->commandQueue.operator()(), 1, hEvt->evt, &ev);
-		clReleaseEvent(ev);
+		handleError(clEnqueueMarkerWithWaitList(hCommandQueue->commandQueue.operator()(), 1, hEvt->evt, &ev));
+		handleError(clReleaseEvent(ev));
 		//cl::Event ev;
 		//hCommandQueue->commandQueue.enqueueMarkerWithWaitList(&(hEvt->evt2),&ev);
 
