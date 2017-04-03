@@ -629,7 +629,7 @@ extern "C"
 
 			program = cl::Program(context, string);
 
-			err__ = handleError( program.build(0, 0, 0));
+			err__ = program.build(0, 0, 0);
 			
 
 			size_t *logSize = new size_t[1];
