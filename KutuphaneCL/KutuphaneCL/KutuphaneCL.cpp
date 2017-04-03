@@ -1320,9 +1320,9 @@ extern "C"
 		evt.push_back(evt0);
 		evt.push_back(evt1);
 		evt.push_back(evt2);
-		hCommandQueue->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[0]);
-		hCommandQueue2->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[1]);
-		hCommandQueue3->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[2]);
+		handleError(hCommandQueue->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[0]));
+		handleError(hCommandQueue2->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[1]));
+		handleError(hCommandQueue3->commandQueue.enqueueBarrierWithWaitList(NULL, &evt[2]));
 		cl_event * evt_ = new cl_event[3];
 		evt_[0] = evt[0].operator()();
 		evt_[1] = evt[1].operator()();
@@ -1330,39 +1330,39 @@ extern "C"
 		//clWaitForEvents(3, evt_);
 
 		int evtStatus0 = 0;
-		clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
-			sizeof(cl_int), &evtStatus0, NULL);
+		handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
+			sizeof(cl_int), &evtStatus0, NULL));
 
 		while (evtStatus0 > 0)
 		{
 
-			clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
-				sizeof(cl_int), &evtStatus0, NULL);
+			handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
+				sizeof(cl_int), &evtStatus0, NULL));
 			Sleep(0);
 		}
 
 		int evtStatus1 = 0;
-		clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
-			sizeof(cl_int), &evtStatus1, NULL);
+		handleError(clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
+			sizeof(cl_int), &evtStatus1, NULL));
 
 		while (evtStatus1 > 0)
 		{
 
-			clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
-				sizeof(cl_int), &evtStatus1, NULL);
+			handleError(clGetEventInfo(evt_[1], CL_EVENT_COMMAND_EXECUTION_STATUS,
+				sizeof(cl_int), &evtStatus1, NULL));
 			Sleep(0);
 		}
-
+		
 
 		int evtStatus2 = 0;
-		clGetEventInfo(evt_[2], CL_EVENT_COMMAND_EXECUTION_STATUS,
-			sizeof(cl_int), &evtStatus2, NULL);
+		handleError(clGetEventInfo(evt_[2], CL_EVENT_COMMAND_EXECUTION_STATUS,
+			sizeof(cl_int), &evtStatus2, NULL));
 
 		while (evtStatus2 > 0)
 		{
 
-			clGetEventInfo(evt_[2], CL_EVENT_COMMAND_EXECUTION_STATUS,
-				sizeof(cl_int), &evtStatus2, NULL);
+			handleError(clGetEventInfo(evt_[2], CL_EVENT_COMMAND_EXECUTION_STATUS,
+				sizeof(cl_int), &evtStatus2, NULL));
 
 			Sleep(0);
 		}
@@ -1378,7 +1378,7 @@ extern "C"
 		void getDeviceName(OpenClDevice * device, StringInformation * string)
 	{
 		cl::STRING_CLASS str;
-		device->clDevice.getInfo(CL_DEVICE_NAME, &str);
+		handleError(device->clDevice.getInfo(CL_DEVICE_NAME, &str));
 		string->writeString(str.c_str());
 	}
 }
