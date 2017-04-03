@@ -32,10 +32,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KutuphaneCL.cpp">
+    <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="KutuphaneCL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

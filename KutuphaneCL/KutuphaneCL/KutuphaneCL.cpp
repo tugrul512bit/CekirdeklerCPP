@@ -1,5 +1,5 @@
-//    Cekirdekler API: a C# explicit multi-device load-balancer opencl wrapper
-//    Copyright(C) 2017 Hüseyin Tuğrul BÜYÜKIŞIK
+ï»¿//    Cekirdekler API: a C# explicit multi-device load-balancer opencl wrapper
+//    Copyright(C) 2017 HÃ¼seyin TuÃ°rul BÃœYÃœKIÃIK
 
 //   This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,85 @@
 extern "C"
 {
 
+	// stackoverflow
+	const char *getErrorString(cl_int error)
+	{
+		switch (error) {
+			// run-time and JIT compiler errors
+		case 0: return "CL_SUCCESS";
+		case -1: return "CL_DEVICE_NOT_FOUND";
+		case -2: return "CL_DEVICE_NOT_AVAILABLE";
+		case -3: return "CL_COMPILER_NOT_AVAILABLE";
+		case -4: return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+		case -5: return "CL_OUT_OF_RESOURCES";
+		case -6: return "CL_OUT_OF_HOST_MEMORY";
+		case -7: return "CL_PROFILING_INFO_NOT_AVAILABLE";
+		case -8: return "CL_MEM_COPY_OVERLAP";
+		case -9: return "CL_IMAGE_FORMAT_MISMATCH";
+		case -10: return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+		case -11: return "CL_BUILD_PROGRAM_FAILURE";
+		case -12: return "CL_MAP_FAILURE";
+		case -13: return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+		case -14: return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+		case -15: return "CL_COMPILE_PROGRAM_FAILURE";
+		case -16: return "CL_LINKER_NOT_AVAILABLE";
+		case -17: return "CL_LINK_PROGRAM_FAILURE";
+		case -18: return "CL_DEVICE_PARTITION_FAILED";
+		case -19: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
 
+			// compile-time errors
+		case -30: return "CL_INVALID_VALUE";
+		case -31: return "CL_INVALID_DEVICE_TYPE";
+		case -32: return "CL_INVALID_PLATFORM";
+		case -33: return "CL_INVALID_DEVICE";
+		case -34: return "CL_INVALID_CONTEXT";
+		case -35: return "CL_INVALID_QUEUE_PROPERTIES";
+		case -36: return "CL_INVALID_COMMAND_QUEUE";
+		case -37: return "CL_INVALID_HOST_PTR";
+		case -38: return "CL_INVALID_MEM_OBJECT";
+		case -39: return "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+		case -40: return "CL_INVALID_IMAGE_SIZE";
+		case -41: return "CL_INVALID_SAMPLER";
+		case -42: return "CL_INVALID_BINARY";
+		case -43: return "CL_INVALID_BUILD_OPTIONS";
+		case -44: return "CL_INVALID_PROGRAM";
+		case -45: return "CL_INVALID_PROGRAM_EXECUTABLE";
+		case -46: return "CL_INVALID_KERNEL_NAME";
+		case -47: return "CL_INVALID_KERNEL_DEFINITION";
+		case -48: return "CL_INVALID_KERNEL";
+		case -49: return "CL_INVALID_ARG_INDEX";
+		case -50: return "CL_INVALID_ARG_VALUE";
+		case -51: return "CL_INVALID_ARG_SIZE";
+		case -52: return "CL_INVALID_KERNEL_ARGS";
+		case -53: return "CL_INVALID_WORK_DIMENSION";
+		case -54: return "CL_INVALID_WORK_GROUP_SIZE";
+		case -55: return "CL_INVALID_WORK_ITEM_SIZE";
+		case -56: return "CL_INVALID_GLOBAL_OFFSET";
+		case -57: return "CL_INVALID_EVENT_WAIT_LIST";
+		case -58: return "CL_INVALID_EVENT";
+		case -59: return "CL_INVALID_OPERATION";
+		case -60: return "CL_INVALID_GL_OBJECT";
+		case -61: return "CL_INVALID_BUFFER_SIZE";
+		case -62: return "CL_INVALID_MIP_LEVEL";
+		case -63: return "CL_INVALID_GLOBAL_WORK_SIZE";
+		case -64: return "CL_INVALID_PROPERTY";
+		case -65: return "CL_INVALID_IMAGE_DESCRIPTOR";
+		case -66: return "CL_INVALID_COMPILER_OPTIONS";
+		case -67: return "CL_INVALID_LINKER_OPTIONS";
+		case -68: return "CL_INVALID_DEVICE_PARTITION_COUNT";
 
-	static int sizeOf_[20]{ sizeof(cl_float),sizeof(cl_double),sizeof(cl_long),sizeof(cl_int), sizeof(cl_uint),sizeof(cl_char),sizeof(cl_half),7,8,9,10,11,12,13,14,15,16,17,18,19};
+			// extension errors
+		case -1000: return "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR";
+		case -1001: return "CL_PLATFORM_NOT_FOUND_KHR";
+		case -1002: return "CL_INVALID_D3D10_DEVICE_KHR";
+		case -1003: return "CL_INVALID_D3D10_RESOURCE_KHR";
+		case -1004: return "CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR";
+		case -1005: return "CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR";
+		default: return "Unknown OpenCL error";
+		}
+	}
+
+	static int sizeOf_[20]{ sizeof(cl_float),sizeof(cl_double),sizeof(cl_long),sizeof(cl_int), sizeof(cl_uint),sizeof(cl_char),sizeof(cl_half),7,8,9,10,11,12,13,14,15,16,17,18,19 };
 
 	class ClArr
 	{
@@ -44,12 +120,12 @@ extern "C"
 		static const int ARR_UINT = 4;
 		static const int ARR_BYTE = 5;
 		static const int ARR_CHAR = 6;
-		
+
 		char * pArr;
 		char * pAArr;
 		int length;
 		int arrType;
-		ClArr(int n, int alignment,int arrType_)
+		ClArr(int n, int alignment, int arrType_)
 		{
 			arrType = arrType_;
 			pArr = new char[n*sizeOf_[arrType] + alignment];
@@ -69,7 +145,7 @@ extern "C"
 			pArr = NULL;
 			pAArr = NULL;
 		}
-		
+
 	};
 
 	__declspec(dllexport)
@@ -86,11 +162,11 @@ extern "C"
 	}
 
 	__declspec(dllexport)
-		ClArr * createArray(int n, int alignment,int arrType)
+		ClArr * createArray(int n, int alignment, int arrType)
 	{
-		return new ClArr(n, alignment,arrType);
+		return new ClArr(n, alignment, arrType);
 	}
-	
+
 	__declspec(dllexport)
 		char * alignedArrHead(ClArr * hArr)
 	{
@@ -691,7 +767,7 @@ extern "C"
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
 			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL);
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL , NULL);
+			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL);
 	}
 
 	__declspec(dllexport)
@@ -757,7 +833,7 @@ extern "C"
 	__declspec(dllexport)
 		void setKernelArgument(OpenClKernel *hKernel, OpenClBuffer * hBuffer, int index_)
 	{
-		hKernel->kernel.setArg(index_, hBuffer->buffer); 
+		hKernel->kernel.setArg(index_, hBuffer->buffer);
 	}
 
 
@@ -891,15 +967,15 @@ extern "C"
 		// if not gddr and if not host ptr, map-unmap and read-write
 		if (hBuffer->gddr || ((!hBuffer->gddr) && hBuffer->arr___ == NULL))
 		{
-			
+
 			if (hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
+				hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
 				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt));
-		
-			
-			if(!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
-				NULL,NULL);
+
+
+			if (!hBuffer->gddr)
+				hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
+					NULL, NULL);
 		}
 		if (!hBuffer->gddr)
 			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
@@ -936,21 +1012,21 @@ extern "C"
 		if (!hBuffer->gddr)
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, ref, m,
 			(hArr->evt.size()>0) ? &(hArr->evt) : NULL, NULL);
-		
+
 		// if gddr, no map-unmap, just read-write
 		// if not gddr and if host ptr, just map-unmap
 		// if not gddr and if not host ptr, map-unmap and read-write
 		if (hBuffer->gddr || ((!hBuffer->gddr) && hBuffer->arr___ == NULL))
 		{
-			
-			if(hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
+
+			if (hBuffer->gddr)
+				hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
 				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt));
-		
-			
+
+
 			if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
-				NULL, NULL);
+				hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
+					NULL, NULL);
 
 		}
 		if (!hBuffer->gddr)
@@ -1155,9 +1231,9 @@ extern "C"
 		~OpenClUserEvent()
 		{
 			// clReleaseEvent(evt[0]);
-			// gerektiği kadar release yapılacak
-			// yapılacak: sadece gerekli olduğu zaman command queue 'ye eklenecek
-			// çünkü burada fazladan release event gerekiyor. Sonra ref count negatif oluyor 0 olmalı
+			// gerektiÃ°i kadar release yapÃ½lacak
+			// yapÃ½lacak: sadece gerekli olduÃ°u zaman command queue 'ye eklenecek
+			// Ã§Ã¼nkÃ¼ burada fazladan release event gerekiyor. Sonra ref count negatif oluyor 0 olmalÃ½
 			//clReleaseEvent(evt[0]);
 			//clReleaseEvent(evt[0]);
 			//clReleaseEvent(evt[0]);
