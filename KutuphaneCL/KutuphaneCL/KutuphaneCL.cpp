@@ -851,7 +851,7 @@ extern "C"
 	__declspec(dllexport)
 		void setKernelArgument(OpenClKernel *hKernel, OpenClBuffer * hBuffer, int index_)
 	{
-		hKernel->kernel.setArg(index_, hBuffer->buffer);
+		handleError(hKernel->kernel.setArg(index_, hBuffer->buffer));
 	}
 
 
@@ -939,7 +939,7 @@ extern "C"
 				for (int i = 0; i < num__; i++)
 				{
 					if (!copies[i])
-						clReleaseEvent(evt[i].operator()());
+						handleError(clReleaseEvent(evt[i].operator()()));
 				}
 			}
 			evt.clear();
@@ -987,17 +987,17 @@ extern "C"
 		{
 
 			if (hBuffer->gddr)
-				hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
-				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt));
+				handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
+				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt)));
 
 
 			if (!hBuffer->gddr)
-				hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
-					NULL, NULL);
+				handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p,
+					NULL, NULL));
 		}
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
-				NULL, hEvt == NULL ? NULL : &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
+				NULL, hEvt == NULL ? NULL : &(hEvt->evt)));
 
 	}
 
@@ -1008,11 +1008,11 @@ extern "C"
 	{
 		int result_ = -1;
 
-		result_ = hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel,
+		result_ =handleError( hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel,
 			hRangeReference_->ndrange,
 			hRangeGlobal_->ndrange,
 			hRangeLocal_->ndrange,
-			(hArr->evt.size()>0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt));
+			(hArr->evt.size()>0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt)));
 
 		return result_;
 	}
@@ -1038,18 +1038,18 @@ extern "C"
 		{
 
 			if (hBuffer->gddr)
-				hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
-				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt));
+				handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
+				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, hEvt == NULL ? NULL : &(hEvt->evt)));
 
 
 			if (!hBuffer->gddr)
-				hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
-					NULL, NULL);
+				handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p,
+					NULL, NULL));
 
 		}
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
-				NULL, hEvt == NULL ? NULL : &(hEvt->evt));
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2,
+				NULL, hEvt == NULL ? NULL : &(hEvt->evt)));
 
 
 	}
