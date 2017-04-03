@@ -111,6 +111,7 @@ extern "C"
 	{
 		if (err != CL_SUCCESS)
 		{
+			std::cout << getErrorString(err) << std::endl;
 			throw std::runtime_error(getErrorString(err));
 		}
 		else
