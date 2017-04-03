@@ -678,10 +678,11 @@ extern "C"
 	private:
 	public:
 		cl::Kernel kernel;
-		int err_ = -1;
+		cl_int err_;
 		OpenClKernel(cl::Program program, const char * nameOfKernel_)
 		{
-			kernel = cl::Kernel(program, nameOfKernel_, (cl_int *)&err_);
+			kernel = cl::Kernel(program, nameOfKernel_, &err_);
+			handleError(err_);
 		}
 
 		~OpenClKernel()
@@ -781,9 +782,14 @@ extern "C"
 	__declspec(dllexport)
 		void writeToBuffer(OpenClCommandQueue * hCommandQueue, OpenClBuffer * hBuffer, void * ptr)
 	{
+		cl_int err = 0;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
-			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL);
+		{
+			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL, &err);
+			handleError(err);
+		}
+
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
 		{
 			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
@@ -795,10 +801,13 @@ extern "C"
 	__declspec(dllexport)
 		void readFromBuffer(OpenClCommandQueue * hCommandQueue, OpenClBuffer * hBuffer, void * ptr)
 	{
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
-			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL);
-
+		{
+			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL,&err);
+			handleError(err);
+		}
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
 		if (!hBuffer->gddr)
@@ -813,11 +822,13 @@ extern "C"
 		size_t m = range_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		char * p = (char *)ptr + ref;
 
-
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
-			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, ref, m, NULL, NULL);
-
+		{
+			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, ref, m, NULL, NULL,&err);
+			handleError(err);
+		}
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p, NULL, NULL));
 		if (!hBuffer->gddr)
@@ -832,11 +843,13 @@ extern "C"
 		size_t ref = reference_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		size_t m = range_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		char * p = (char *)ptr + ref;
-
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
-			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), ref, m, NULL, NULL);
-
+		{
+			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), ref, m, NULL, NULL,&err);
+			handleError(err);
+		}
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p, NULL, &ev));
 		if (!hBuffer->gddr)
@@ -978,12 +991,14 @@ extern "C"
 		size_t m = range_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		char * p = (char *)ptr + ref;
 
-
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
+		{
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), ref, m,
-			(hArr->evt.size()>0) ? &(hArr->evt) : NULL, NULL);
-
+				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, NULL,&err);
+			handleError(err);
+		}
 		// if gddr, no map-unmap, just read-write
 		// if not gddr and if host ptr, just map-unmap
 		// if not gddr and if not host ptr, map-unmap and read-write
@@ -1029,12 +1044,14 @@ extern "C"
 		size_t m = range_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		char * p = (char *)ptr + ref;
 
-
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
+		{
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, ref, m,
-			(hArr->evt.size()>0) ? &(hArr->evt) : NULL, NULL);
-
+				(hArr->evt.size() > 0) ? &(hArr->evt) : NULL, NULL,&err);
+			handleError(err);
+		}
 		// if gddr, no map-unmap, just read-write
 		// if not gddr and if host ptr, just map-unmap
 		// if not gddr and if not host ptr, map-unmap and read-write
@@ -1062,11 +1079,14 @@ extern "C"
 		void writeToBufferEvent(OpenClCommandQueue * hCommandQueue, OpenClBuffer * hBuffer,
 			void * ptr, OpenClEventArray * hArr, OpenClEvent * hEvt)
 	{
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
+		{
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb],
-				&(hArr->evt), NULL);
-
+				&(hArr->evt), NULL,&err);
+			handleError(err);
+		}
 		if (hBuffer->arr___ == NULL && !hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0,
 				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
@@ -1085,12 +1105,14 @@ extern "C"
 		void readFromBufferEvent(OpenClCommandQueue * hCommandQueue, OpenClBuffer * hBuffer,
 			void * ptr, OpenClEventArray * hArr, OpenClEvent * hEvt)
 	{
-
+		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
+		{
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb],
-				&(hArr->evt), NULL);
-
+				&(hArr->evt), NULL,&err);
+			handleError(err);
+		}
 		if (hBuffer->arr___ == NULL && !hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0,
 				hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
