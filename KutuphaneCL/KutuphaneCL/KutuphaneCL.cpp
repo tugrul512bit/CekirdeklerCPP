@@ -214,9 +214,9 @@ extern "C"
 			devicesACC = std::vector<cl::Device>();
 
 			cl_int err;
-			err =handleError(p.getDevices(CL_DEVICE_TYPE_CPU, &devicesCPU));
-			err =handleError(p.getDevices(CL_DEVICE_TYPE_GPU, &devicesGPU));
-			err =handleError(p.getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devicesACC));
+			err =(p.getDevices(CL_DEVICE_TYPE_CPU, &devicesCPU));
+			err =(p.getDevices(CL_DEVICE_TYPE_GPU, &devicesGPU));
+			err =(p.getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devicesACC));
 			
 		}
 
