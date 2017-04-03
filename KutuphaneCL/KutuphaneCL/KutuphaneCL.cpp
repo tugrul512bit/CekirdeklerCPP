@@ -633,9 +633,9 @@ extern "C"
 			
 
 			size_t *logSize = new size_t[1];
-			clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, 0, NULL, logSize);
+			handleError(clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, 0, NULL, logSize));
 			char *logData = new char[(int)logSize[0]];
-			clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, logSize[0], logData, NULL);
+			handleError(clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, logSize[0], logData, NULL));
 			errMsg__ = new StringInformation((int)logSize[0]);
 			writeToString(errMsg__, logData);
 		}
@@ -781,9 +781,11 @@ extern "C"
 		if (!hBuffer->gddr)
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL);
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL);
+		{
+			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
+		}
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL));
 	}
 
 	__declspec(dllexport)
@@ -794,9 +796,9 @@ extern "C"
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], NULL, NULL);
 
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, 0, hBuffer->es*hBuffer->ocl->clInformation__[hBuffer->clb], ptr, NULL, NULL));
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL));
 	}
 
 	__declspec(dllexport)
@@ -813,9 +815,9 @@ extern "C"
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, CL_MAP_READ, ref, m, NULL, NULL);
 
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueReadBuffer(hBuffer->buffer, false, ref, m, p, NULL, NULL));
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL));
 
 	}
 
@@ -832,9 +834,9 @@ extern "C"
 			ptr2 = hCommandQueue->commandQueue.enqueueMapBuffer(hBuffer->buffer, false, (hBuffer->arr___ == NULL ? CL_MAP_WRITE_INVALIDATE_REGION : CL_MAP_WRITE), ref, m, NULL, NULL);
 
 		if (hBuffer->arr___ == NULL || hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p, NULL, &ev);
+			handleError(hCommandQueue->commandQueue.enqueueWriteBuffer(hBuffer->buffer, false, ref, m, p, NULL, &ev));
 		if (!hBuffer->gddr)
-			hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL);
+			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL));
 	}
 
 	__declspec(dllexport)
