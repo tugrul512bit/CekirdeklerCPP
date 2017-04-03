@@ -627,7 +627,7 @@ extern "C"
 			strings__.push_back(stringValue);
 			clDevices__.push_back(device);
 
-			program = cl::Program(context, string);
+			program = cl::Program(context, string); 
 
 			err__ = program.build(0, 0, 0);
 			
