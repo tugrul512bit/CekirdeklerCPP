@@ -583,11 +583,12 @@ extern "C"
 		cl::CommandQueue commandQueue;
 		OpenClCommandQueue(cl::Context context, cl::Device device, int async)
 		{
+			cl_int err;
 			if (async != 0)
-				commandQueue = cl::CommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, NULL);
+				commandQueue = cl::CommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
 			else
-				commandQueue = cl::CommandQueue(context, device);
-
+				commandQueue = cl::CommandQueue(context, device,0Ui64,&err);
+			handleError(err);
 		}
 
 		~OpenClCommandQueue()
@@ -749,16 +750,18 @@ extern "C"
 			ocl = new OpenClInformation();
 			clb = clInfo_;
 			es = numberOfElements_;
+			cl_int err;
 			if (GDDR_BUFFER)
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, NULL);
+				buffer = cl::Buffer(context, CL_MEM_READ_WRITE, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL,&err);
 			else if (isCSharpArray_ == 0 && arr__ != NULL)
 			{
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__, NULL);
+				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__,&err);
 			}
 			else
 			{
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, NULL);
+				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL,&err);
 			}
+			handleError(err);
 		}
 
 		~OpenClBuffer()
