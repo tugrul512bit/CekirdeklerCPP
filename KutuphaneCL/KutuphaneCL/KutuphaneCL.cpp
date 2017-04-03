@@ -107,6 +107,19 @@ extern "C"
 		}
 	}
 
+	cl_int handleError(cl_int err)
+	{
+		if (err != CL_SUCCESS)
+		{
+			std::cout << getErrorString(err);
+			throw std::exception();
+		}
+		else
+		{
+			return err;
+		}
+	}
+
 	static int sizeOf_[20]{ sizeof(cl_float),sizeof(cl_double),sizeof(cl_long),sizeof(cl_int), sizeof(cl_uint),sizeof(cl_char),sizeof(cl_half),7,8,9,10,11,12,13,14,15,16,17,18,19 };
 
 	class ClArr
@@ -136,7 +149,6 @@ extern "C"
 			}
 			else
 				pAArr = pArr;
-
 		}
 
 		~ClArr()
@@ -203,10 +215,10 @@ extern "C"
 			devicesACC = std::vector<cl::Device>();
 
 			cl_int err;
-			err = p.getDevices(CL_DEVICE_TYPE_CPU, &devicesCPU);
-			err = p.getDevices(CL_DEVICE_TYPE_GPU, &devicesGPU);
-			err = p.getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devicesACC);
-
+			err =handleError(p.getDevices(CL_DEVICE_TYPE_CPU, &devicesCPU));
+			err =handleError(p.getDevices(CL_DEVICE_TYPE_GPU, &devicesGPU));
+			err =handleError(p.getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devicesACC));
+			
 		}
 
 
@@ -235,7 +247,7 @@ extern "C"
 		{
 			std::vector<cl::Platform> platformsTmp = std::vector< cl::Platform>();
 			platforms = std::vector< cl::Platform>();
-			cl::Platform::get(&platformsTmp);
+			handleError( cl::Platform::get(&platformsTmp));
 			for (int i = 0; i < platformsTmp.size(); i++)
 			{
 				//CL_PLATFORM_VERSION(1.2 or 2.0) numpad 1 , keypad 1 possible bug with different chars
