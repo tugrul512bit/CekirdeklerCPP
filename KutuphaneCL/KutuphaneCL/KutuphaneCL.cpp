@@ -841,7 +841,7 @@ extern "C"
 
 	__declspec(dllexport)
 		void deleteBuffer(OpenClBuffer * hBuffer)
-	{
+	{ 
 		delete hBuffer;
 	}
 
