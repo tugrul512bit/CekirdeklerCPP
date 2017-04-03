@@ -111,8 +111,7 @@ extern "C"
 	{
 		if (err != CL_SUCCESS)
 		{
-			std::cout << getErrorString(err);
-			throw std::exception();
+			throw std::runtime_error(getErrorString(err));
 		}
 		else
 		{
@@ -330,7 +329,7 @@ extern "C"
 			cl_bool tmp = 0;
 			// opencl 1.2:  CL_DEVICE_HOST_UNIFIED_MEMORY !!
 			// opencl 2.0 - 2.x:  CL_DEVICE_SVM_CAPABILITIES !!
-			clDevice.getInfo(CL_DEVICE_HOST_UNIFIED_MEMORY, &tmp);
+			handleError(clDevice.getInfo(CL_DEVICE_HOST_UNIFIED_MEMORY, &tmp));
 			if (tmp == CL_TRUE)
 				GDDR = false;
 			else if (tmp == CL_FALSE)
@@ -342,13 +341,18 @@ extern "C"
 		{
 			cl_device_partition_property p[]{ CL_DEVICE_PARTITION_BY_COUNTS, count_, CL_DEVICE_PARTITION_BY_COUNTS_LIST_END, 0 };
 			std::vector<cl::Device> clDevices;
-			if (clDevice.createSubDevices(p, &clDevices) == CL_SUCCESS)
+			cl_int err_create;
+			if ((err_create= clDevice.createSubDevices(p, &clDevices)) == CL_SUCCESS)
 			{
 				clSubDevice = clDevices[0];
 				clDevice = clDevices[0];
+
 				return 0;
 			}
-
+			else
+			{
+				handleError(err_create);
+			}
 			return 1;
 		}
 
@@ -625,8 +629,8 @@ extern "C"
 
 			program = cl::Program(context, string);
 
-			err__ = program.build(0, 0, 0);
-
+			err__ = handleError( program.build(0, 0, 0));
+			
 
 			size_t *logSize = new size_t[1];
 			clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, 0, NULL, logSize);
