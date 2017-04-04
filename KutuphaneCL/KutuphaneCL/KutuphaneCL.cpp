@@ -141,7 +141,13 @@ extern "C"
 		ClArr(int n, int alignment, int arrType_)
 		{
 			arrType = arrType_;
-			pArr = new char[n*sizeOf_[arrType] + alignment];
+			pArr = new (std::nothrow)char[n*sizeOf_[arrType] + alignment];
+			if (pArr == nullptr)
+			{
+				std::cout << "C++ memory allocation failure. " << std::endl;
+				throw std::runtime_error("C++ memory allocation failure. ");
+			}
+
 			length = n;
 			if (((size_t)pArr) % alignment != 0)
 			{
