@@ -120,6 +120,43 @@ extern "C"
 		}
 	}
 
+	class StringInformation
+	{
+	public:
+		char * string;
+		StringInformation(int num_)
+		{
+			string = new char[num_];
+			for (int i = 0; i < num_; i++)
+			{
+				string[i] = ' ';
+			}
+		}
+
+		void writeString(const char* c)
+		{
+			if (string != NULL)
+				delete[] string;
+			int l = strlen(c);
+			string = new char[l + 1];
+			strcpy_s(string, l + 1, c);
+		}
+
+		char * readString()
+		{
+			return string;
+		}
+
+		~StringInformation()
+		{
+			if (string != NULL)
+			{
+				delete[] string;
+			}
+		}
+	};
+
+
 	static int sizeOf_[20]{ sizeof(cl_float),sizeof(cl_double),sizeof(cl_long),sizeof(cl_int), sizeof(cl_uint),sizeof(cl_char),sizeof(cl_half),7,8,9,10,11,12,13,14,15,16,17,18,19 };
 
 	class ClArr
@@ -211,9 +248,14 @@ extern "C"
 		static const int CPU_CODE = CL_DEVICE_TYPE_CPU;
 		static const int GPU_CODE = CL_DEVICE_TYPE_GPU;
 		static const int ACC_CODE = CL_DEVICE_TYPE_ACCELERATOR;
-
+		// 0=amd, 1=nvidia, 2=intel, 3=altera, 4=xilinx
+		int vendor = -1;
+		StringInformation *nameStr=nullptr;
+		StringInformation *vendorStr=nullptr;
 		PlatformDeviceInformation(cl::Platform p)
 		{
+			nameStr = new StringInformation(1);
+			vendorStr = new StringInformation(1);
 			platform = p;
 
 			devicesCPU = std::vector<cl::Device>();
@@ -224,7 +266,30 @@ extern "C"
 			err =(p.getDevices(CL_DEVICE_TYPE_CPU, &devicesCPU));
 			err =(p.getDevices(CL_DEVICE_TYPE_GPU, &devicesGPU));
 			err =(p.getDevices(CL_DEVICE_TYPE_ACCELERATOR, &devicesACC));
-			
+
+
+			cl::STRING_CLASS nameString;
+			cl::STRING_CLASS vendorString;
+			err = handleError(p.getInfo(CL_PLATFORM_NAME, &nameString));
+			err = handleError(p.getInfo(CL_PLATFORM_VENDOR, &vendorString));
+
+			nameStr = new StringInformation(nameString.size());
+			vendorStr = new StringInformation(vendorString.size());
+			nameStr->writeString(nameString.c_str());
+			vendorStr->writeString(vendorString.c_str());
+		}
+
+		~PlatformDeviceInformation()
+		{
+			if (nameStr != nullptr)
+			{
+				delete nameStr;
+			}
+
+			if (vendorStr != nullptr)
+			{
+				delete vendorStr;
+			}
 		}
 
 
@@ -249,6 +314,7 @@ extern "C"
 	public:
 		std::vector<cl::Platform> platforms;
 		int numberOfPlatforms;
+
 		OpenClPlatformList()
 		{
 			std::vector<cl::Platform> platformsTmp = std::vector< cl::Platform>();
@@ -473,41 +539,6 @@ extern "C"
 			return new OpenClDevice(hPlatform->devicesACC[index_]);
 	}
 
-	class StringInformation
-	{
-	public:
-		char * string;
-		StringInformation(int num_)
-		{
-			string = new char[num_];
-			for (int i = 0; i < num_; i++)
-			{
-				string[i] = ' ';
-			}
-		}
-
-		void writeString(const char* c)
-		{
-			if (string != NULL)
-				delete[] string;
-			int l = strlen(c);
-			string = new char[l + 1];
-			strcpy_s(string, l + 1, c);
-		}
-
-		char * readString()
-		{
-			return string;
-		}
-
-		~StringInformation()
-		{
-			if (string != NULL)
-			{
-				delete[] string;
-			}
-		}
-	};
 
 	__declspec(dllexport)
 		StringInformation *  getPlatformInfo(PlatformDeviceInformation  *hPlatform)
@@ -567,6 +598,18 @@ extern "C"
 		char * readFromString(StringInformation * hStringInfo_)
 	{
 		return hStringInfo_->readString();
+	}
+
+	__declspec(dllexport)
+	StringInformation * getPlatformNameString(PlatformDeviceInformation * hPlatform)
+	{
+		return hPlatform->nameStr;
+	}
+
+	__declspec(dllexport)
+	StringInformation * getPlatformVendorNameString(PlatformDeviceInformation * hPlatform)
+	{
+		return hPlatform->vendorStr;
 	}
 
 	__declspec(dllexport)
