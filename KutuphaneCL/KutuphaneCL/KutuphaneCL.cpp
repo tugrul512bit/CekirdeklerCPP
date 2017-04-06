@@ -423,7 +423,7 @@ extern "C"
 			{
 				clSubDevice = clDevices[0];
 				clDevice = clDevices[0];
-
+				numberOfComputeUnits = count_;
 				return 0;
 			}
 			else
