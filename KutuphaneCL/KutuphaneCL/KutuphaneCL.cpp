@@ -272,7 +272,7 @@ extern "C"
 			cl::STRING_CLASS vendorString;
 			err = handleError(p.getInfo(CL_PLATFORM_NAME, &nameString));
 			err = handleError(p.getInfo(CL_PLATFORM_VENDOR, &vendorString));
-
+			
 			nameStr = new StringInformation(nameString.size());
 			vendorStr = new StringInformation(vendorString.size());
 			nameStr->writeString(nameString.c_str());
@@ -396,6 +396,7 @@ extern "C"
 		bool GDDR;
 		int openclMajorVer = 0;
 		int openclMinorVer = 0;
+		int numberOfComputeUnits = 0;
 		OpenClDevice(cl::Device device_)
 		{
 			clDevice = device_;
@@ -408,6 +409,9 @@ extern "C"
 			else if (tmp == CL_FALSE)
 				GDDR = true;
 
+			cl_uint computeUnits;
+			handleError(clDevice.getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &computeUnits));
+			numberOfComputeUnits = computeUnits;
 		}
 
 		int partition(int count_)
@@ -439,6 +443,12 @@ extern "C"
 		bool deviceGDDR(OpenClDevice * hDevice)
 	{
 		return hDevice->GDDR;
+	}
+
+	__declspec(dllexport)
+		 int deviceComputeUnits(OpenClDevice * hDevice)
+	{
+		return hDevice->numberOfComputeUnits;
 	}
 
 
