@@ -397,6 +397,7 @@ extern "C"
 		int openclMajorVer = 0;
 		int openclMinorVer = 0;
 		int numberOfComputeUnits = 0;
+		unsigned long memSize = 0;
 		OpenClDevice(cl::Device device_)
 		{
 			clDevice = device_;
@@ -405,13 +406,17 @@ extern "C"
 			// opencl 2.0 - 2.x:  CL_DEVICE_SVM_CAPABILITIES !!
 			handleError(clDevice.getInfo(CL_DEVICE_HOST_UNIFIED_MEMORY, &tmp));
 			if (tmp == CL_TRUE)
-				GDDR = false;
+				GDDR = false; 
 			else if (tmp == CL_FALSE)
 				GDDR = true;
 
 			cl_uint computeUnits;
 			handleError(clDevice.getInfo(CL_DEVICE_MAX_COMPUTE_UNITS, &computeUnits));
 			numberOfComputeUnits = computeUnits;
+			cl_ulong memSizeTmp;
+			handleError(clDevice.getInfo(CL_DEVICE_GLOBAL_MEM_SIZE,&memSizeTmp));
+			memSize = memSizeTmp;
+
 		}
 
 		int partition(int count_)
@@ -451,6 +456,11 @@ extern "C"
 		return hDevice->numberOfComputeUnits;
 	}
 
+	__declspec(dllexport)
+		unsigned long deviceMemSize(OpenClDevice * hDevice)
+	{
+		return hDevice->memSize;
+	}
 
 	class OpenClContext
 	{
@@ -1466,6 +1476,16 @@ extern "C"
 		handleError(device->clDevice.getInfo(CL_DEVICE_NAME, &str));
 		string->writeString(str.c_str());
 	}
+
+	__declspec(dllexport)
+		void getDeviceVendorName(OpenClDevice * device, StringInformation * string)
+	{
+		cl::STRING_CLASS str;
+		handleError(device->clDevice.getInfo(CL_DEVICE_VENDOR, &str));
+		string->writeString(str.c_str());
+	}
+
+	
 }
 
 
