@@ -334,23 +334,37 @@ extern "C"
 				}
 				else if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(7) == '2' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(7) == '2')
 				{
+					bool adding = false;
 					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '0' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '0')
 					{
-						platforms.push_back(platformsTmp[i]);
+						adding = true;
 					}
-					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1')
+					else if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1')
 					{
-						
-						platforms.push_back(platformsTmp[i]);
+						adding = true;
 					}
-					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2')
+					else if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2')
 					{
-						platforms.push_back(platformsTmp[i]);
+						adding = true;
 					}
-					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3')
+					else if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3')
 					{
-						platforms.push_back(platformsTmp[i]);
+						adding = true;
 					}
+
+					// check if not "experimental" nor "beta"
+					cl::STRING_CLASS strPName = platformsTmp[i].getInfo<CL_PLATFORM_NAME>();
+					if ((strPName.find("experimental") != cl::STRING_CLASS::npos) || 
+						(strPName.find("EXPERIMENTAL") != cl::STRING_CLASS::npos) ||
+						(strPName.find("experımental") != cl::STRING_CLASS::npos) ||
+						(strPName.find("Experimental") != cl::STRING_CLASS::npos) ||
+						(strPName.find("Experımental") != cl::STRING_CLASS::npos))
+					{
+						adding = false;
+					}
+
+					if(adding)
+						platforms.push_back(platformsTmp[i]);
 				}
 
 			}
