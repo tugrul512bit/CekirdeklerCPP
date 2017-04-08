@@ -123,7 +123,7 @@ extern "C"
 	class StringInformation
 	{
 	public:
-		char * string;
+		char * string=NULL;
 		StringInformation(int num_)
 		{
 			string = new char[num_];
@@ -138,6 +138,7 @@ extern "C"
 			if (string != NULL)
 				delete[] string;
 			int l = strlen(c);
+
 			string = new char[l + 1];
 			strcpy_s(string, l + 1, c);
 		}
@@ -153,6 +154,7 @@ extern "C"
 			{
 				delete[] string;
 			}
+
 		}
 	};
 
@@ -254,8 +256,6 @@ extern "C"
 		StringInformation *vendorStr=nullptr;
 		PlatformDeviceInformation(cl::Platform p)
 		{
-			nameStr = new StringInformation(1);
-			vendorStr = new StringInformation(1);
 			platform = p;
 
 			devicesCPU = std::vector<cl::Device>();
@@ -275,8 +275,8 @@ extern "C"
 			
 			nameStr = new StringInformation(nameString.size());
 			vendorStr = new StringInformation(vendorString.size());
-			nameStr->writeString(nameString.c_str());
-			vendorStr->writeString(vendorString.c_str());
+			nameStr->writeString(nameString.data());
+			vendorStr->writeString(vendorString.data());
 		}
 
 		~PlatformDeviceInformation()
@@ -284,11 +284,13 @@ extern "C"
 			if (nameStr != nullptr)
 			{
 				delete nameStr;
+				nameStr = nullptr;
 			}
 
 			if (vendorStr != nullptr)
 			{
 				delete vendorStr;
+				vendorStr = nullptr;
 			}
 		}
 
