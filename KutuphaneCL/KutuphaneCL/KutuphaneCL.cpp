@@ -706,9 +706,9 @@ extern "C"
 			
 
 			size_t *logSize = new size_t[1];
-			handleError(clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, 0, NULL, logSize));
+			clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, 0, NULL, logSize);
 			char *logData = new char[(int)logSize[0]];
-			handleError(clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, logSize[0], logData, NULL));
+			clGetProgramBuildInfo(program(), device(), CL_PROGRAM_BUILD_LOG, logSize[0], logData, NULL);
 			errMsg__ = new StringInformation((int)logSize[0]);
 			writeToString(errMsg__, logData);
 		}
@@ -753,7 +753,7 @@ extern "C"
 		OpenClKernel(cl::Program program, const char * nameOfKernel_)
 		{
 			kernel = cl::Kernel(program, nameOfKernel_, &err_);
-			handleError(err_);
+			
 		}
 
 		~OpenClKernel()
