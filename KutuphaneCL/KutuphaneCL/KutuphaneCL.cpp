@@ -338,6 +338,19 @@ extern "C"
 					{
 						platforms.push_back(platformsTmp[i]);
 					}
+					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '1')
+					{
+						
+						platforms.push_back(platformsTmp[i]);
+					}
+					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '2')
+					{
+						platforms.push_back(platformsTmp[i]);
+					}
+					if (platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3' || platformsTmp[i].getInfo<CL_PLATFORM_VERSION>().at(9) == '3')
+					{
+						platforms.push_back(platformsTmp[i]);
+					}
 				}
 
 			}
