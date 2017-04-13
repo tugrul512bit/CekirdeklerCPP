@@ -53,7 +53,7 @@ extern "C"
 		case -16: return "CL_LINKER_NOT_AVAILABLE";
 		case -17: return "CL_LINK_PROGRAM_FAILURE";
 		case -18: return "CL_DEVICE_PARTITION_FAILED";
-		case -19: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE";
+		case -19: return "CL_KERNEL_ARG_INFO_NOT_AVAILABLE"; 
 
 			// compile-time errors
 		case -30: return "CL_INVALID_VALUE";
