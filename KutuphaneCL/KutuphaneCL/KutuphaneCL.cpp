@@ -28,7 +28,7 @@
 #include <time.h>
 extern "C"
 {
-
+	long version = 100020000;
 	__declspec(dllexport)
 	void copyMemory(char * dest, char * src, unsigned int count)
 	{
