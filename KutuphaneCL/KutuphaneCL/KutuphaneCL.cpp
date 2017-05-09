@@ -1,5 +1,5 @@
 ﻿//    Cekirdekler API: a C# explicit multi-device load-balancer opencl wrapper
-//    Copyright(C) 2017 Hüseyin Tuðrul BÜYÜKIÞIK
+//    Copyright(C) 2017 Hüseyin Tuðrul BÜYÜKISIK
 
 //   This program is free software: you can redistribute it and/or modify
 //    it under the terms of the GNU General Public License as published by
@@ -29,11 +29,16 @@
 extern "C"
 {
 
+	__declspec(dllexport)
+	void copyMemory(char * dest, char * src, unsigned int count)
+	{
+		std::copy(src, src + count, dest);
+	}
+
 	// stackoverflow
 	const char *getErrorString(cl_int error)
 	{
 		switch (error) {
-			// run-time and JIT compiler errors
 		case 0: return "CL_SUCCESS";
 		case -1: return "CL_DEVICE_NOT_FOUND";
 		case -2: return "CL_DEVICE_NOT_AVAILABLE";
