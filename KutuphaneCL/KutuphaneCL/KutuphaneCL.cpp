@@ -28,7 +28,14 @@
 #include <time.h>
 extern "C"
 {
-	long version = 100020000;
+	long version = 100020006;
+
+	__declspec(dllexport)
+	void repeatKernelNTimes()
+	{
+
+	}
+
 	__declspec(dllexport)
 	void copyMemory(char * dest, char * src, unsigned int count)
 	{
@@ -1012,6 +1019,27 @@ extern "C"
 		int result_ = -1;
 		cl::Event ev;
 		result_ = hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel, hRangeReference_->ndrange, hRangeGlobal_->ndrange, hRangeLocal_->ndrange, NULL, &ev);
+		return result_;
+	}
+
+	__declspec(dllexport)
+		int computeRepeated(OpenClCommandQueue * hCommandQueue, OpenClKernel * hKernel, OpenClNDRange * hRangeReference_, OpenClNDRange * hRangeGlobal_, OpenClNDRange * hRangeLocal_,int repeats)
+	{
+		int result_ = -1;
+		for(int i=0;i<repeats;i++)
+			hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel, hRangeReference_->ndrange, hRangeGlobal_->ndrange, hRangeLocal_->ndrange, NULL, NULL);
+		return result_;
+	}
+
+	__declspec(dllexport)
+		int computeRepeatedWithSyncKernel(OpenClCommandQueue * hCommandQueue, OpenClKernel * hKernel, OpenClNDRange * hRangeReference_, OpenClNDRange * hRangeGlobal_, OpenClNDRange * hRangeLocal_, int repeats, OpenClKernel * hSyncKernel, OpenClNDRange * hZeroRange)
+	{
+		int result_ = -1;
+		for (int i = 0; i < repeats; i++)
+		{
+			hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel, hRangeReference_->ndrange, hRangeGlobal_->ndrange, hRangeLocal_->ndrange, NULL, NULL);
+			hCommandQueue->commandQueue.enqueueNDRangeKernel(hSyncKernel->kernel, hZeroRange->ndrange, hRangeLocal_->ndrange, hRangeLocal_->ndrange, NULL, NULL);
+		}
 		return result_;
 	}
 
