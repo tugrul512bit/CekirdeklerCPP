@@ -28,7 +28,7 @@
 #include <time.h>
 extern "C"
 {
-	long version = 100020006;
+	long version = 100020008;
 
 	__declspec(dllexport)
 	void repeatKernelNTimes()
@@ -923,6 +923,29 @@ extern "C"
 		if (!hBuffer->gddr)
 			handleError(hCommandQueue->commandQueue.enqueueUnmapMemObject(hBuffer->buffer, ptr2, NULL, NULL));
 	}
+	
+	// for C# side, char arrays must have  CharSet.Unicode in dllimport specifier
+	__declspec(dllexport)
+		void charArrayTest(void * ptr)
+	{
+		char*c = (char*)ptr;
+		c[0] = 0;
+		c[1] = 97;
+		c[2] = 0;
+		c[3] = 97;
+		c[4] = 97;
+		c[5] = 97;
+		c[6] = 97;
+		c[7] = 97;
+		c[8] = 97;
+		c[9] = 97;
+		c[10] = 97;
+		c[11] = 97;
+		c[12] = 97;
+		c[13] = 97;
+		c[14] = 97;
+	}
+
 
 	__declspec(dllexport)
 		void readFromBufferRanged(OpenClCommandQueue * hCommandQueue, OpenClBuffer * hBuffer, int reference_, int range_, void * ptr)
@@ -931,7 +954,6 @@ extern "C"
 		size_t ref = reference_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		size_t m = range_*hBuffer->ocl->clInformation__[hBuffer->clb];
 		char * p = (char *)ptr + ref;
-
 		cl_int err;
 		void * ptr2 = NULL;
 		if (!hBuffer->gddr)
@@ -1017,8 +1039,8 @@ extern "C"
 		int compute(OpenClCommandQueue * hCommandQueue, OpenClKernel * hKernel, OpenClNDRange * hRangeReference_, OpenClNDRange * hRangeGlobal_, OpenClNDRange * hRangeLocal_)
 	{
 		int result_ = -1;
-		cl::Event ev;
-		result_ = hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel, hRangeReference_->ndrange, hRangeGlobal_->ndrange, hRangeLocal_->ndrange, NULL, &ev);
+		//cl::Event ev;
+		result_ = hCommandQueue->commandQueue.enqueueNDRangeKernel(hKernel->kernel, hRangeReference_->ndrange, hRangeGlobal_->ndrange, hRangeLocal_->ndrange, NULL, NULL /*&ev*/);
 		return result_;
 	}
 
