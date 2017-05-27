@@ -28,7 +28,7 @@
 #include <time.h>
 extern "C"
 {
-	long version = 100020008;
+	long version = 100020009;
 
 	__declspec(dllexport)
 	void repeatKernelNTimes()
@@ -854,24 +854,65 @@ extern "C"
 		int es = 0;
 		void * arr___ = NULL;
 		bool gddr = false;
-		OpenClBuffer(cl::Context context, int numberOfElements_, int clInfo_, int isCSharpArray_, void * arr__, bool GDDR_BUFFER)
+		bool readOnly_ = false;
+		bool writeOnly_ = false;
+		OpenClBuffer(cl::Context context, int numberOfElements_, int clInfo_, int isCSharpArray_, void * arr__, bool GDDR_BUFFER,bool readOnly,bool writeOnly)
 		{
+			readOnly_ = readOnly;
+			writeOnly_ = writeOnly;
 			gddr = GDDR_BUFFER;
 			arr___ = arr__;
 			ocl = new OpenClInformation();
 			clb = clInfo_;
 			es = numberOfElements_;
 			cl_int err;
-			if (GDDR_BUFFER)
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL,&err);
-			else if (isCSharpArray_ == 0 && arr__ != NULL)
+			/*
+				CL_MEM_HOST_READ_ONLY--> "write_only"
+				CL_MEM_WRITE_ONLY--> "write_only"
+
+				CL_MEM_HOST_WRITE_ONLY--> "read_only"
+				CL_MEM_READ_ONLY--> "read_only"
+			*/
+			if (readOnly)
 			{
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__,&err);
+				if (GDDR_BUFFER)
+					buffer = cl::Buffer(context, CL_MEM_HOST_WRITE_ONLY | CL_MEM_READ_ONLY, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				else if (isCSharpArray_ == 0 && arr__ != NULL)
+				{
+					buffer = cl::Buffer(context, CL_MEM_HOST_WRITE_ONLY | CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__, &err);
+				}
+				else
+				{
+					buffer = cl::Buffer(context, CL_MEM_HOST_WRITE_ONLY | CL_MEM_READ_ONLY | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				}
+			}
+			else if (writeOnly)
+			{
+				if (GDDR_BUFFER)
+					buffer = cl::Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				else if (isCSharpArray_ == 0 && arr__ != NULL)
+				{
+					buffer = cl::Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__, &err);
+				}
+				else
+				{
+					buffer = cl::Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				}
 			}
 			else
 			{
-				buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL,&err);
+				if (GDDR_BUFFER)
+					buffer = cl::Buffer(context, CL_MEM_READ_WRITE, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				else if (isCSharpArray_ == 0 && arr__ != NULL)
+				{
+					buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), arr__, &err);
+				}
+				else
+				{
+					buffer = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_ALLOC_HOST_PTR, (size_t)(numberOfElements_*ocl->clInformation__[clInfo_]), NULL, &err);
+				}
 			}
+
 			handleError(err);
 		}
 
@@ -883,9 +924,9 @@ extern "C"
 
 
 	__declspec(dllexport)
-		OpenClBuffer * createBuffer(OpenClContext * hContext, int numElements_, int clInfo_, int isCSharpArray, void *arr_, bool GDDR_BUFFER)
+		OpenClBuffer * createBuffer(OpenClContext * hContext, int numElements_, int clInfo_, int isCSharpArray, void *arr_, bool GDDR_BUFFER,bool readOnly,bool writeOnly)
 	{
-		return new OpenClBuffer(hContext->context, numElements_, clInfo_, isCSharpArray, arr_, GDDR_BUFFER);
+		return new OpenClBuffer(hContext->context, numElements_, clInfo_, isCSharpArray, arr_, GDDR_BUFFER,readOnly,writeOnly);
 	}
 
 
