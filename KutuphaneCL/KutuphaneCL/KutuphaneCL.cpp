@@ -28,7 +28,7 @@
 #include <time.h>
 extern "C"
 {
-	long version = 100020009;
+	long version = 1000200012;
 
 	__declspec(dllexport)
 	void repeatKernelNTimes()
