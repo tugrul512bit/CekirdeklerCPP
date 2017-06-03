@@ -1362,10 +1362,10 @@ extern "C"
 		evt_[0] = evt[0].operator()();
 		evt_[1] = evt[1].operator()();
 
-		//clWaitForEvents(2, evt_);
+		clWaitForEvents(2, evt_);
 
 
-
+		/*
 		int evtStatus0 = 0;
 		handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
 			sizeof(cl_int), &evtStatus0, NULL));
@@ -1389,7 +1389,7 @@ extern "C"
 				sizeof(cl_int), &evtStatus1, NULL));
 			Sleep(0);
 		}
-
+		*/
 		//clReleaseEvent(evt_[0]);
 		//clReleaseEvent(evt_[1]);
 
@@ -1529,6 +1529,21 @@ extern "C"
 
 	}
 
+
+	__declspec(dllexport)
+		void waitN(OpenClCommandQueue ** hCommandQueueArray, OpenClCommandQueue * hCommandQueueToSync, const int n)
+	{
+		std::vector<cl::Event> evtVect;
+		for (int i = 0; i < n; i++)
+		{
+			evtVect.push_back(cl::Event());
+			hCommandQueueArray[i]->commandQueue.enqueueMarkerWithWaitList(NULL, &evtVect[i]);
+			hCommandQueueArray[i]->commandQueue.flush();
+		}
+		hCommandQueueToSync->commandQueue.enqueueMarkerWithWaitList(&evtVect, NULL);
+		hCommandQueueToSync->commandQueue.finish();
+	}
+
 	__declspec(dllexport)
 		void wait3(OpenClCommandQueue * hCommandQueue, OpenClCommandQueue * hCommandQueue2, OpenClCommandQueue * hCommandQueue3)
 	{
@@ -1547,8 +1562,8 @@ extern "C"
 		evt_[0] = evt[0].operator()();
 		evt_[1] = evt[1].operator()();
 		evt_[2] = evt[2].operator()();
-		//clWaitForEvents(3, evt_);
-
+		clWaitForEvents(3, evt_);
+		/*
 		int evtStatus0 = 0;
 		handleError(clGetEventInfo(evt_[0], CL_EVENT_COMMAND_EXECUTION_STATUS,
 			sizeof(cl_int), &evtStatus0, NULL));
@@ -1586,6 +1601,7 @@ extern "C"
 
 			Sleep(0);
 		}
+		*/
 		//clReleaseEvent(evt_[0]);
 		//clReleaseEvent(evt_[1]);
 		//clReleaseEvent(evt_[2]);
