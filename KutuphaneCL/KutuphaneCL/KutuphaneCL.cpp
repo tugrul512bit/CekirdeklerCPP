@@ -26,6 +26,7 @@
 #include <chrono>
 #include <thread>
 #include <time.h>
+#include <mutex>
 extern "C"
 {
 	long version = 1000200012;
@@ -688,24 +689,84 @@ extern "C"
 	class OpenClCommandQueue
 	{
 	private:
+		int counter;
+		std::mutex m;
 
 	public:
 		cl::CommandQueue commandQueue;
 		OpenClCommandQueue(cl::Context context, cl::Device device, int async)
 		{
+			counter = 0;
 			cl_int err;
 			if (async != 0)
 				commandQueue = cl::CommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
 			else
-				commandQueue = cl::CommandQueue(context, device,0Ui64,&err);
+				commandQueue = cl::CommandQueue(context, device,0Ui64,&err); 
 			handleError(err);
 		}
+
+		// increments a counter whenever an observed marker calls its callback
+		static void CL_CALLBACK markerCallbackCounter(cl_event evt, cl_int cint, void * vp)
+		{
+			((OpenClCommandQueue *)vp)->incrementMarkerCounter();
+		}
+
+		void incrementMarkerCounter()
+		{
+			m.lock();
+			counter++;
+			m.unlock();
+		}
+
+		// adds a marker to command queue to know when it has been reached(by a callback)
+		void addMarkerForCountingWithCallback()
+		{
+			cl::Event evt;
+			commandQueue.enqueueMarkerWithWaitList(NULL, &evt);
+			evt.setCallback(CL_COMPLETE, &markerCallbackCounter, this);
+		}
+
+		void resetMarkerCallbackCounter()
+		{
+			m.lock();
+			counter = 0;
+			m.unlock();
+		}
+
+		int getCount()
+		{
+			int result = 0;
+			m.lock();
+			result = counter;
+			m.unlock();
+			return result;
+		}
+
 
 		~OpenClCommandQueue()
 		{
 
 		}
 	};
+
+
+	__declspec(dllexport)
+		void addMarkerToCommandQueue(OpenClCommandQueue * hCommandQueue)
+	{
+		hCommandQueue->addMarkerForCountingWithCallback();
+	}
+
+	__declspec(dllexport)
+		int getMarkerCounterOfCommandQueue(OpenClCommandQueue * hCommandQueue)
+	{
+		return hCommandQueue->getCount();
+	}
+
+	__declspec(dllexport)
+		void resetMarkerCounterOfCommandQueue(OpenClCommandQueue * hCommandQueue)
+	{
+		hCommandQueue->resetMarkerCallbackCounter();
+	}
 
 	__declspec(dllexport)
 		OpenClCommandQueue * createCommandQueue(OpenClContext * hContext, OpenClDevice * hDevice, int async)
