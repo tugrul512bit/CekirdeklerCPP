@@ -29,7 +29,7 @@
 #include <mutex>
 extern "C"
 {
-	long version = 1000200012;
+	long version = 100030001;
 
 	__declspec(dllexport)
 	void repeatKernelNTimes()
