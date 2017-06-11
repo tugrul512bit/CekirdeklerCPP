@@ -30,7 +30,7 @@
 extern "C"
 {
 	long version = 100030001;
-
+	bool betaVersion = false;
 	__declspec(dllexport)
 	void repeatKernelNTimes()
 	{
