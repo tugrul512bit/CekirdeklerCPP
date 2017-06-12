@@ -34,7 +34,7 @@ extern "C"
 	__declspec(dllexport)
 	void repeatKernelNTimes()
 	{
-
+		// to do: check if out of order queue works for intel amd nvidia
 	}
 
 	__declspec(dllexport)
