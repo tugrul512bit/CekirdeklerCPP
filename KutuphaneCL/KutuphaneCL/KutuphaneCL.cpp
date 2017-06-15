@@ -29,7 +29,7 @@
 #include <mutex>
 extern "C"
 {
-	long version = 100030001;
+	long version = 100030003;
 	bool betaVersion = false;
 	__declspec(dllexport)
 	void repeatKernelNTimes()
@@ -701,7 +701,8 @@ extern "C"
 			if (async != 0)
 				commandQueue = cl::CommandQueue(context, device, CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE, &err);
 			else
-				commandQueue = cl::CommandQueue(context, device,0Ui64,&err); 
+				commandQueue = cl::CommandQueue(context, device, CL_QUEUE_PROFILING_ENABLE, &err);
+				//commandQueue = cl::CommandQueue(context, device,0Ui64,&err); 
 			handleError(err);
 		}
 
