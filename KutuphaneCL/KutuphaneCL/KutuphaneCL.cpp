@@ -29,7 +29,7 @@
 #include <mutex>
 extern "C"
 {
-	long version = 100030003;
+	long version = 100030006;
 	bool betaVersion = false;
 	__declspec(dllexport)
 	void repeatKernelNTimes()
@@ -1599,9 +1599,11 @@ extern "C"
 		for (int i = 0; i < n; i++)
 		{
 			evtVect.push_back(cl::Event());
+			//hCommandQueueArray[i]->commandQueue.enqueueBarrierWithWaitList(NULL, &evtVect[i]);
 			hCommandQueueArray[i]->commandQueue.enqueueMarkerWithWaitList(NULL, &evtVect[i]);
 			hCommandQueueArray[i]->commandQueue.flush();
 		}
+		//hCommandQueueToSync->commandQueue.enqueueBarrierWithWaitList(&evtVect, NULL);
 		hCommandQueueToSync->commandQueue.enqueueMarkerWithWaitList(&evtVect, NULL);
 		hCommandQueueToSync->commandQueue.finish();
 	}
