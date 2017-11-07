@@ -40,7 +40,7 @@ extern "C"
 	__declspec(dllexport)
 	void copyMemory(char * dest, char * src, unsigned int count)
 	{
-		std::copy(src, src + count, dest);
+		std::copy(src, src + count, dest); 
 	}
 
 	// stackoverflow
@@ -790,6 +790,7 @@ extern "C"
 		int err0__ = -1;
 		StringInformation * errMsg__ = NULL;
 		cl::Program program;
+		std::string options;
 		OpenClProgram(cl::Context context, cl::Device device, std::string  string)
 		{
 			std::pair<const void *, size_t> stringValue = std::pair<const void *, size_t>();
@@ -802,8 +803,8 @@ extern "C"
 			clDevices__.push_back(device);
 
 			program = cl::Program(context, string); 
-
-			err__ = program.build(0, 0, 0);
+			options.append(" -cl-std=CL1.2 ");
+			err__ = program.build(options.c_str(), 0, 0);
 			
 
 			size_t *logSize = new size_t[1];
